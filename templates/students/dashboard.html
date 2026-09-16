@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+{% block page_title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--navy);">Welcome back, {{ profile.full_name }}!</h2>
+    <p class="text-muted">Here's an overview of your internship journey.</p>
+</div>
+
+<!-- Profile Completion -->
+<div class="progress-bar-container">
+    <div class="progress-label">
+        <span>Profile Completion</span>
+        <span>{{ profile.profile_completion }}%</span>
+    </div>
+    <div class="progress-track">
+        <div class="progress-fill" style="width: {{ profile.profile_completion }}%;" data-width="{{ profile.profile_completion }}%"></div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card blue">
+        <div class="stat-icon blue"><i class="fas fa-paper-plane"></i></div>
+        <div class="stat-info">
+            <h4>Total Applications</h4>
+            <div class="stat-number">{{ total_applications }}</div>
+        </div>
+    </div>
+    <div class="stat-card amber">
+        <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+        <div class="stat-info">
+            <h4>Pending</h4>
+            <div class="stat-number">{{ pending_count }}</div>
+        </div>
+    </div>
+    <div class="stat-card purple">
+        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+        <div class="stat-info">
+            <h4>Shortlisted</h4>
+            <div class="stat-number">{{ shortlisted_count }}</div>
+        </div>
+    </div>
+    <div class="stat-card emerald">
+        <div class="stat-icon emerald"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info">
+            <h4>Accepted</h4>
+            <div class="stat-number">{{ accepted_count }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    <a href="{% url 'students:browse_internships' %}" class="btn btn-primary"><i class="fas fa-search"></i> Browse Internships</a>
+    <a href="{% url 'students:edit_profile' %}" class="btn btn-outline"><i class="fas fa-edit"></i> Edit Profile</a>
+</div>
+
+<!-- Recent Applications -->
+<div class="section-header">
+    <h2><i class="fas fa-history"></i> Recent Applications</h2>
+    <a href="{% url 'students:my_applications' %}" class="btn btn-sm btn-outline">View All</a>
+</div>
+
+{% if recent_applications %}
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Internship</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Applied</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in recent_applications %}
+            <tr>
+                <td><strong>{{ app.internship.title }}</strong></td>
+                <td>{{ app.internship.company.company_name }}</td>
+                <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                <td>{{ app.applied_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <h3>No Applications Yet</h3>
+    <p>Start exploring internship opportunities and apply to get started!</p>
+    <a href="{% url 'students:browse_internships' %}" class="btn btn-primary"><i class="fas fa-search"></i> Browse Internships</a>
+</div>
+{% endif %}
+{% endblock %}

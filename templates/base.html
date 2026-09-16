@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IMS{% endblock %} | Internship Management System</title>
+    <meta name="description" content="{% block meta_description %}Internship Management System - Connect students with companies for career-building internship opportunities{% endblock %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>IMS Portal</span>
+                </div>
+            </div>
+            <div class="sidebar-user">
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-avatar">{{ user.username|make_list|first|upper }}</div>
+                    <div class="sidebar-user-details">
+                        <div class="sidebar-username">{{ user.username }}</div>
+                        <div class="sidebar-role">{{ user.get_role_display }}</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-section">Navigation</div>
+                {% if user.is_admin %}
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                <a href="{% url 'dashboard:manage_students' %}" class="sidebar-link"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="{% url 'dashboard:manage_companies' %}" class="sidebar-link"><i class="fas fa-building"></i> Companies</a>
+                <a href="{% url 'dashboard:manage_internships' %}" class="sidebar-link"><i class="fas fa-briefcase"></i> Internships</a>
+                <a href="{% url 'dashboard:manage_applications' %}" class="sidebar-link"><i class="fas fa-file-alt"></i> Applications</a>
+                <a href="{% url 'dashboard:reports' %}" class="sidebar-link"><i class="fas fa-chart-bar"></i> Reports</a>
+                {% elif user.is_student %}
+                <a href="{% url 'students:dashboard' %}" class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'students:profile' %}" class="sidebar-link"><i class="fas fa-user"></i> My Profile</a>
+                <a href="{% url 'students:browse_internships' %}" class="sidebar-link"><i class="fas fa-search"></i> Browse Internships</a>
+                <a href="{% url 'students:my_applications' %}" class="sidebar-link"><i class="fas fa-paper-plane"></i> My Applications</a>
+                {% elif user.is_company %}
+                <a href="{% url 'companies:dashboard' %}" class="sidebar-link"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'companies:profile' %}" class="sidebar-link"><i class="fas fa-building"></i> Company Profile</a>
+                <a href="{% url 'companies:post_internship' %}" class="sidebar-link"><i class="fas fa-plus-circle"></i> Post Internship</a>
+                <a href="{% url 'companies:my_internships' %}" class="sidebar-link"><i class="fas fa-list"></i> My Internships</a>
+                {% endif %}
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% url 'accounts:logout' %}" class="sidebar-link logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="topbar">
+                <button class="mobile-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="topbar-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    {% if user.is_student %}
+                    <a href="{% url 'students:notifications' %}" class="notification-bell" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications_count %}
+                        <span class="notification-badge">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    {% endif %}
+                    <div></div>
+                </div>
+            </header>
+
+            {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                    {{ message }}
+                    <button class="alert-dismiss" aria-label="Dismiss">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <main class="content-area">
+    {% else %}
+        {% if messages %}
+        <div class="messages-container" style="position:fixed;top:20px;right:20px;z-index:9999;max-width:400px;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                {{ message }}
+                <button class="alert-dismiss">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <main class="content-area-standalone">
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    </main>
+
+    {% if user.is_authenticated %}
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}All Applications{% endblock %}
+{% block page_title %}All Applications{% endblock %}
+
+{% block content %}
+<form method="GET" class="filter-bar">
+    <select name="status" class="form-control" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="reviewed" {% if filter_status == 'reviewed' %}selected{% endif %}>Reviewed</option>
+        <option value="shortlisted" {% if filter_status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+        <option value="accepted" {% if filter_status == 'accepted' %}selected{% endif %}>Accepted</option>
+        <option value="rejected" {% if filter_status == 'rejected' %}selected{% endif %}>Rejected</option>
+    </select>
+</form>
+
+<p class="text-muted text-sm mb-3">{{ applications|length }} application{{ applications|length|pluralize }} found</p>
+
+{% if applications %}
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Internship</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Applied</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td><strong>{{ app.student.full_name }}</strong></td>
+                <td>{{ app.internship.title }}</td>
+                <td>{{ app.internship.company.company_name }}</td>
+                <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                <td>{{ app.applied_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-file-alt"></i>
+    <h3>No Applications Found</h3>
+    <p>{% if filter_status %}No applications with status '{{ filter_status }}'.{% else %}No applications have been submitted yet.{% endif %}</p>
+</div>
+{% endif %}
+{% endblock %}

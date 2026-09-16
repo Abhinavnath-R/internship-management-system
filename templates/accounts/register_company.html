@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Company Registration{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <i class="fas fa-building"></i>
+            <h1>Company Registration</h1>
+            <p>Register your company to post internships</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+        <div class="alert alert-danger" style="margin-bottom: 20px;">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_company_name">Company Name</label>
+                <input type="text" name="company_name" id="id_company_name" class="form-control" placeholder="Acme Corporation" value="{{ form.company_name.value|default_if_none:'' }}" required>
+                {% if form.company_name.errors %}<div class="form-error">{{ form.company_name.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control" placeholder="Choose a username" value="{{ form.username.value|default_if_none:'' }}" required>
+                {% if form.username.errors %}<div class="form-error">{{ form.username.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Business Email</label>
+                <input type="email" name="email" id="id_email" class="form-control" placeholder="hr@company.com" value="{{ form.email.value|default_if_none:'' }}" required>
+                {% if form.email.errors %}<div class="form-error">{{ form.email.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Password</label>
+                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Minimum 8 characters" required>
+                {% if form.password1.errors %}<div class="form-error">{{ form.password1.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirm Password</label>
+                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Re-enter password" required>
+                {% if form.password2.errors %}<div class="form-error">{{ form.password2.errors.0 }}</div>{% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100"><i class="fas fa-building"></i> Create Account</button>
+        </form>
+
+        <div class="auth-links">
+            <p>Already have an account? <a href="{% url 'accounts:login' %}">Login</a></p>
+            <p style="margin-top: 8px;"><a href="{% url 'accounts:register_student' %}">Register as Student instead</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

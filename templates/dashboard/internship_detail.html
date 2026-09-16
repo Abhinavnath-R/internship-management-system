@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ internship.title }} - Internship Details{% endblock %}
+{% block page_title %}Internship Details{% endblock %}
+
+{% block content %}
+<a href="{% url 'dashboard:manage_internships' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Internships</a>
+
+<div class="profile-header">
+    <div class="profile-avatar" style="background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; font-size: 1.5rem;">
+        <i class="fas fa-briefcase"></i>
+    </div>
+    <div>
+        <div class="profile-name">{{ internship.title }}</div>
+        <div class="profile-meta">
+            <a href="{% url 'dashboard:view_company' internship.company.pk %}">{{ internship.company.company_name }}</a>
+            {% if internship.location %} &bull; {{ internship.location }}{% endif %}
+        </div>
+        <div style="margin-top: 8px;">
+            {% if internship.is_expired %}
+            <span class="badge badge-rejected"><i class="fas fa-hourglass-end"></i> Expired</span>
+            {% elif internship.is_active %}
+            <span class="badge badge-active"><i class="fas fa-circle"></i> Active</span>
+            {% else %}
+            <span class="badge badge-inactive"><i class="fas fa-pause-circle"></i> Inactive</span>
+            {% endif %}
+            <span class="badge badge-{{ internship.internship_type }}">{{ internship.get_internship_type_display }}</span>
+            <span class="text-muted">Posted {{ internship.created_at|date:"M d, Y" }}</span>
+        </div>
+    </div>
+    <div style="margin-left: auto;">
+        <div class="btn-group">
+            <form method="POST" action="{% url 'dashboard:toggle_internship_active' internship.pk %}" style="display:inline;">
+                {% csrf_token %}
+                {% if internship.is_active %}
+                <button type="submit" class="btn btn-warning"><i class="fas fa-pause-circle"></i> Deactivate</button>
+                {% else %}
+                <button type="submit" class="btn btn-success"><i class="fas fa-play-circle"></i> Activate</button>
+                {% endif %}
+            </form>
+            <form method="POST" action="{% url 'dashboard:delete_internship' internship.pk %}" style="display:inline;" data-confirm="Are you sure you want to delete this internship?">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="profile-grid">
+    <!-- Basic Info -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+            <div class="profile-field">
+                <span class="label">Company</span>
+                <span class="value"><a href="{% url 'dashboard:view_company' internship.company.pk %}">{{ internship.company.company_name }}</a></span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Title</span>
+                <span class="value">{{ internship.title }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Type</span>
+                <span class="value"><span class="badge badge-{{ internship.internship_type }}">{{ internship.get_internship_type_display }}</span></span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Location</span>
+                <span class="value">{{ internship.location|default:"Not specified" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Duration</span>
+                <span class="value">{{ internship.duration|default:"Not specified" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-clipboard-list"></i> Details</h3>
+            <div class="profile-field">
+                <span class="label">Stipend</span>
+                <span class="value">{% if internship.stipend %}₹{{ internship.stipend }}/month{% else %}Unpaid{% endif %}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Positions Available</span>
+                <span class="value">{{ internship.positions_available }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Application Deadline</span>
+                <span class="value">{{ internship.application_deadline|date:"F d, Y" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Total Applicants</span>
+                <span class="value">{{ internship.total_applications }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Created</span>
+                <span class="value">{{ internship.created_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-align-left"></i> Description</h3>
+            <p>{{ internship.description|linebreaksbr }}</p>
+        </div>
+    </div>
+
+    <!-- Requirements -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-check-circle"></i> Requirements</h3>
+            {% if internship.requirements_list %}
+            <ul class="requirements-list">
+                {% for req in internship.requirements_list %}
+                <li>{{ req }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>{{ internship.requirements|linebreaksbr }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Applicants -->
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-users"></i> Applicants ({{ applications|length }})</h3>
+            {% if applications %}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Email</th>
+                            <th>University</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                            <th>Cover Letter</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td><a href="{% url 'dashboard:view_student' app.student.pk %}"><strong>{{ app.student.full_name }}</strong></a></td>
+                            <td>{{ app.student.user.email }}</td>
+                            <td>{{ app.student.university|default:"—" }}</td>
+                            <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                            <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                            <td>{% if app.cover_letter %}<button class="btn btn-sm btn-outline" onclick="alert('{{ app.cover_letter|escapejs }}')"><i class="fas fa-eye"></i></button>{% else %}—{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No applicants yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

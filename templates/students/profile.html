@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load student_extras %}
+
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="profile-avatar">
+        {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="{{ profile.full_name }}">
+        {% else %}
+        {{ profile.first_name|make_list|first|upper|default:"S" }}
+        {% endif %}
+    </div>
+    <div>
+        <div class="profile-name">{{ profile.full_name }}</div>
+        <div class="profile-meta">
+            {% if profile.university %}{{ profile.university }}{% endif %}
+            {% if profile.major %} &bull; {{ profile.major }}{% endif %}
+        </div>
+        <div style="margin-top: 8px;">
+            <span class="badge badge-active"><i class="fas fa-chart-line"></i> {{ profile.profile_completion }}% Complete</span>
+        </div>
+    </div>
+    <div style="margin-left: auto;">
+        <a href="{% url 'students:edit_profile' %}" class="btn btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+    </div>
+</div>
+
+<!-- Profile Details -->
+<div class="profile-grid">
+    <!-- Personal Info -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
+            <div class="profile-field">
+                <span class="label">Full Name</span>
+                <span class="value">{{ profile.full_name }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Email</span>
+                <span class="value">{{ profile.user.email }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Phone</span>
+                <span class="value">{{ profile.phone|default:"Not provided" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Info -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-graduation-cap"></i> Academic Information</h3>
+            <div class="profile-field">
+                <span class="label">University</span>
+                <span class="value">{{ profile.university|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Degree</span>
+                <span class="value">{{ profile.degree|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Major</span>
+                <span class="value">{{ profile.major|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Graduation Year</span>
+                <span class="value">{{ profile.graduation_year|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">GPA</span>
+                <span class="value">{{ profile.gpa|default:"Not provided" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-tools"></i> Skills</h3>
+            {% if profile.skills %}
+            <div class="skill-tags">
+                {% for skill in profile.skills|split:"," %}
+                <span class="skill-tag">{{ skill|striptags }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No skills added yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bio -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-info-circle"></i> About Me</h3>
+            <p>{{ profile.bio|default:"No bio added yet."|linebreaksbr }}</p>
+        </div>
+    </div>
+
+    <!-- Links -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-link"></i> Links</h3>
+            <div class="profile-field">
+                <span class="label">LinkedIn</span>
+                <span class="value">
+                    {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank">{{ profile.linkedin_url }}</a>{% else %}Not provided{% endif %}
+                </span>
+            </div>
+            <div class="profile-field">
+                <span class="label">GitHub</span>
+                <span class="value">
+                    {% if profile.github_url %}<a href="{{ profile.github_url }}" target="_blank">{{ profile.github_url }}</a>{% else %}Not provided{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-file-pdf"></i> Resume</h3>
+            {% if profile.resume %}
+            <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download Resume</a>
+            {% else %}
+            <p class="text-muted">No resume uploaded. <a href="{% url 'students:edit_profile' %}">Upload now</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

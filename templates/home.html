@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome{% endblock %}
+{% block meta_description %}Internship Management System - Connect students with top companies for career-building internship opportunities{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    <nav class="landing-nav">
+        <div class="landing-nav-logo">
+            <i class="fas fa-graduation-cap"></i>
+            <span>IMS Portal</span>
+        </div>
+        <div class="landing-nav-links">
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:register_student' %}" class="btn btn-sm btn-hero-primary">Get Started</a>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <h1>Your Gateway to<br><span>Career-Building Internships</span></h1>
+        <p class="hero-subtitle">Connect students with top companies for meaningful internship opportunities. Manage applications, track progress, and build your career — all in one place.</p>
+        <div class="hero-buttons">
+            <a href="{% url 'accounts:register_student' %}" class="btn btn-hero-primary"><i class="fas fa-user-graduate"></i> Register as Student</a>
+            <a href="{% url 'accounts:register_company' %}" class="btn btn-hero-outline"><i class="fas fa-building"></i> Register as Company</a>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon blue"><i class="fas fa-search"></i></div>
+                <h3>For Students</h3>
+                <p>Browse and apply to internships from top companies. Track your applications in real-time and build your career profile.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon emerald"><i class="fas fa-briefcase"></i></div>
+                <h3>For Companies</h3>
+                <p>Post internship opportunities and discover the best talent. Review applications and manage your hiring pipeline efficiently.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon purple"><i class="fas fa-cogs"></i></div>
+                <h3>For Administrators</h3>
+                <p>Manage the entire internship ecosystem. Verify companies, moderate postings, and generate comprehensive reports.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <p>&copy; 2025 Internship Management System. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}

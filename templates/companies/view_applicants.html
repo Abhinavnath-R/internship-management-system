@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Applicants - {{ internship.title }}{% endblock %}
+{% block page_title %}View Applicants{% endblock %}
+
+{% block content %}
+<a href="{% url 'companies:my_internships' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to My Internships</a>
+
+<div class="section-header">
+    <div>
+        <h2>Applicants for: {{ internship.title }}</h2>
+        <p class="text-muted text-sm">{{ applications|length }} applicant{{ applications|length|pluralize }}</p>
+    </div>
+</div>
+
+{% if applications %}
+{% for app in applications %}
+<div class="applicant-card">
+    <div class="applicant-header">
+        <div class="applicant-info">
+            <div class="applicant-avatar">{{ app.student.first_name|make_list|first|upper|default:"S" }}</div>
+            <div>
+                <div class="applicant-name">{{ app.student.full_name }}</div>
+                <div class="applicant-meta">{{ app.student.university }} &bull; {{ app.student.major }}</div>
+            </div>
+        </div>
+        <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span>
+    </div>
+
+    <div class="applicant-details">
+        <span><i class="fas fa-envelope"></i> {{ app.student.user.email }}</span>
+        <span><i class="fas fa-phone"></i> {{ app.student.phone|default:"Not provided" }}</span>
+        <span><i class="fas fa-calendar"></i> Applied: {{ app.applied_at|date:"M d, Y" }}</span>
+        {% if app.student.resume %}
+        <span><a href="{{ app.student.resume.url }}" target="_blank"><i class="fas fa-file-pdf"></i> Download Resume</a></span>
+        {% endif %}
+    </div>
+
+    {% if app.cover_letter %}
+    <div class="applicant-cover-letter">
+        <strong>Cover Letter:</strong><br>
+        {{ app.cover_letter|linebreaksbr }}
+    </div>
+    {% endif %}
+
+    <div class="applicant-actions">
+        <form method="POST" action="{% url 'companies:update_application_status' app.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="reviewed">
+            <button type="submit" class="btn btn-sm btn-primary" {% if app.status == 'reviewed' %}disabled{% endif %}><i class="fas fa-eye"></i> Reviewed</button>
+        </form>
+        <form method="POST" action="{% url 'companies:update_application_status' app.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="shortlisted">
+            <button type="submit" class="btn btn-sm btn-warning" {% if app.status == 'shortlisted' %}disabled{% endif %}><i class="fas fa-star"></i> Shortlist</button>
+        </form>
+        <form method="POST" action="{% url 'companies:update_application_status' app.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="accepted">
+            <button type="submit" class="btn btn-sm btn-success" {% if app.status == 'accepted' %}disabled{% endif %}><i class="fas fa-check"></i> Accept</button>
+        </form>
+        <form method="POST" action="{% url 'companies:update_application_status' app.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="rejected">
+            <button type="submit" class="btn btn-sm btn-danger" {% if app.status == 'rejected' %}disabled{% endif %}><i class="fas fa-times"></i> Reject</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-users"></i>
+    <h3>No Applicants Yet</h3>
+    <p>No students have applied to this internship yet. Applications will appear here once students apply.</p>
+</div>
+{% endif %}
+{% endblock %}

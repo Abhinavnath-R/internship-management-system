@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Companies{% endblock %}
+{% block page_title %}Manage Companies{% endblock %}
+
+{% block extra_css %}
+<style>
+    .company-cell { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .completion-bar { width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .completion-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--purple), #a78bfa); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="filter-tabs">
+    <a href="{% url 'dashboard:manage_companies' %}" class="filter-tab {% if not verified %}active{% endif %}">All Companies</a>
+    <a href="{% url 'dashboard:manage_companies' %}?verified=yes" class="filter-tab {% if verified == 'yes' %}active{% endif %}">Verified</a>
+    <a href="{% url 'dashboard:manage_companies' %}?verified=no" class="filter-tab {% if verified == 'no' %}active{% endif %}">Unverified</a>
+</div>
+
+<form method="GET" class="filter-bar">
+    {% if verified %}<input type="hidden" name="verified" value="{{ verified }}">{% endif %}
+    <div class="search-input-wrapper">
+        <i class="fas fa-search"></i>
+        <input type="text" name="q" class="form-control" placeholder="Search by company name, industry, email, or location..." value="{{ search_query|default:'' }}">
+    </div>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+</form>
+
+<p class="text-muted text-sm mb-3">{{ companies|length }} compan{{ companies|length|pluralize:"y,ies" }} found</p>
+
+{% if companies %}
+<div class="table-container" style="overflow-x: auto;">
+    <table class="table" style="min-width: 1100px;">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Industry</th>
+                <th>Location</th>
+                <th>Contact</th>
+                <th>Website</th>
+                <th>Internships</th>
+                <th>Verified</th>
+                <th>Completion</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td>
+                    <a href="{% url 'dashboard:view_company' company.pk %}"><strong>{{ company.company_name }}</strong></a>
+                    <div class="text-muted" style="font-size: 12px;">@{{ company.user.username }}</div>
+                </td>
+                <td>{{ company.industry|default:"—" }}</td>
+                <td>{{ company.location|default:"—"|truncatechars:20 }}</td>
+                <td class="company-cell">
+                    <div style="font-size: 12px;">{{ company.contact_email|default:company.user.email }}</div>
+                    <div class="text-muted" style="font-size: 11px;">{{ company.contact_phone|default:"—" }}</div>
+                </td>
+                <td class="company-cell">
+                    {% if company.website %}<a href="{{ company.website }}" target="_blank" style="font-size: 12px;">{{ company.website|truncatechars:25 }}</a>{% else %}<span class="text-muted">—</span>{% endif %}
+                </td>
+                <td><strong>{{ company.total_internships }}</strong></td>
+                <td>
+                    {% if company.is_verified %}
+                    <span class="badge badge-verified" style="font-size: 11px;"><i class="fas fa-check-circle"></i> Verified</span>
+                    {% if not company.user.is_active %}
+                    <div style="font-size: 10px; color: var(--red); margin-top: 2px;">Inactive</div>
+                    {% endif %}
+                    {% else %}
+                    <span class="badge badge-unverified" style="font-size: 11px;"><i class="fas fa-clock"></i> Unverified</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="completion-bar"><div class="completion-bar-fill" style="width: {{ company.profile_completion }}%;"></div></div>
+                    <span style="font-size: 12px; font-weight: 600;">{{ company.profile_completion }}%</span>
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'dashboard:view_company' company.pk %}" class="btn btn-sm btn-outline" title="View Details"><i class="fas fa-eye"></i></a>
+                        {% if not company.is_verified %}
+                        <form method="POST" action="{% url 'dashboard:verify_company' company.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success" title="Verify Company"><i class="fas fa-check-circle"></i></button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{% url 'dashboard:toggle_company_active' company.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            {% if company.user.is_active %}
+                            <button type="submit" class="btn btn-sm btn-warning" title="Deactivate"><i class="fas fa-pause-circle"></i></button>
+                            {% else %}
+                            <button type="submit" class="btn btn-sm btn-success" title="Activate"><i class="fas fa-play-circle"></i></button>
+                            {% endif %}
+                        </form>
+                        {% endif %}
+                        <form method="POST" action="{% url 'dashboard:delete_company' company.pk %}" style="display:inline;" data-confirm="Are you sure you want to delete {{ company.company_name }}? This will remove all their internships and data.">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-building"></i>
+    <h3>No Companies Found</h3>
+    <p>
+        {% if search_query %}
+            No companies match your search.
+        {% elif verified == 'no' %}
+            No unverified companies.
+        {% elif verified == 'yes' %}
+            No verified companies yet.
+        {% else %}
+            No companies have registered yet.
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+{% endblock %}

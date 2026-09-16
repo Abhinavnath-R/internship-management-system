@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}My Internships{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h1 style="margin: 0;">My Internships</h1>
+        <a href="{% url 'companies:post_internship' %}" class="btn btn-primary" 
+           style="background: #007bff; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+            <i class="fas fa-plus"></i> Post New Internship
+        </a>
+    </div>
+
+    {% if internships %}
+        <div style="display: grid; gap: 20px;">
+            {% for internship in internships %}
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                    <div>
+                        <h3 style="margin: 0 0 8px 0; font-size: 1.2rem;">{{ internship.title }}</h3>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+                            <span style="background: #e9ecef; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                {{ internship.get_internship_type_display }}
+                            </span>
+                            <span style="background: #e9ecef; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                {{ internship.location }}
+                            </span>
+                            <span style="background: #e9ecef; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                {{ internship.duration }}
+                            </span>
+                            {% if internship.stipend %}
+                            <span style="background: #d4edda; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; color: #155724;">
+                                ₹{{ internship.stipend }} stipend
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        {% if internship.is_expired %}
+                            <span style="background: #f8d7da; color: #721c24; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                ⏰ Expired
+                            </span>
+                        {% elif internship.is_active %}
+                            <span style="background: #d4edda; color: #155724; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                ✅ Live
+                            </span>
+                        {% else %}
+                            <span style="background: #f8d7da; color: #721c24; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                ⏸ Inactive
+                            </span>
+                        {% endif %}
+                        {% if internship.is_active %}
+                            <span style="background: #cce5ff; color: #004085; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                Active
+                            </span>
+                        {% else %}
+                            <span style="background: #f8d7da; color: #721c24; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                                Inactive
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <p style="color: #6c757d; margin-bottom: 12px; line-height: 1.5;">
+                    {{ internship.description|truncatechars:200 }}
+                </p>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="font-size: 0.9rem; color: #6c757d;">
+                        <span>📅 Deadline: {{ internship.application_deadline|date:"M d, Y" }}</span>
+                        <span style="margin-left: 15px;">👥 {{ internship.total_applications }} applicants</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{% url 'companies:view_applicants' internship.id %}" 
+                           style="background: #007bff; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">
+                            👥 View Applicants
+                        </a>
+                        <a href="{% url 'companies:edit_internship' internship.id %}" 
+                           style="background: #28a745; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">
+                            ✏️ Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <i class="fas fa-briefcase" style="font-size: 48px; color: #dee2e6; margin-bottom: 16px;"></i>
+            <h3 style="color: #6c757d; margin-bottom: 8px;">No Internships Posted Yet</h3>
+            <p style="color: #868e96;">Post your first internship to start receiving applications from students.</p>
+            <a href="{% url 'companies:post_internship' %}" class="btn btn-primary" 
+               style="display: inline-block; margin-top: 16px; background: #007bff; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+                📝 Post Internship
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}View Applicants{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+    <div style="margin-bottom: 24px;">
+        <a href="{% url 'companies:my_internships' %}" style="color: #007bff; text-decoration: none;">
+            ← Back to Internships
+        </a>
+        <h1 style="margin: 8px 0 4px 0;">{{ internship.title }}</h1>
+        <p style="color: #6c757d; margin: 0;">Applications for this internship</p>
+    </div>
+
+    {% if applications %}
+        <div style="display: grid; gap: 16px;">
+            {% for application in applications %}
+            <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #e9ecef;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0;">{{ application.student.full_name }}</h4>
+                        <p style="margin: 4px 0 0 0; color: #6c757d; font-size: 0.9rem;">
+                            Applied: {{ application.applied_at|date:"M d, Y H:i" }}
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span style="background: #e9ecef; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                            {{ application.get_status_display }}
+                        </span>
+                        <a href="#" style="background: #007bff; color: white; padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 12px;">
+            <i class="fas fa-users" style="font-size: 48px; color: #dee2e6; margin-bottom: 16px;"></i>
+            <h3 style="color: #6c757d;">No Applications Yet</h3>
+            <p style="color: #868e96;">Students haven't applied to this internship yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

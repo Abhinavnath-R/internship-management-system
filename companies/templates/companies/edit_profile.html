@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;">Edit Company Profile</h1>
+        <a href="{% url 'companies:profile' %}" style="color: #007bff; text-decoration: none;">← Back to Profile</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div style="background: {% if message.tags == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        {% csrf_token %}
+        
+        <!-- Company Name -->
+        <div style="margin-bottom: 16px;">
+            <label for="company_name" style="display: block; font-weight: 600; margin-bottom: 6px;">Company Name *</label>
+            <input type="text" id="company_name" name="company_name" 
+                   value="{{ profile.company_name }}" 
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; box-sizing: border-box; transition: border-color 0.15s ease-in-out;">
+        </div>
+
+        <!-- Industry -->
+        <div style="margin-bottom: 16px;">
+            <label for="industry" style="display: block; font-weight: 600; margin-bottom: 6px;">Industry</label>
+            <input type="text" id="industry" name="industry" 
+                   value="{{ profile.industry }}" 
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; box-sizing: border-box;">
+        </div>
+
+        <!-- Location -->
+        <div style="margin-bottom: 16px;">
+            <label for="location" style="display: block; font-weight: 600; margin-bottom: 6px;">Location</label>
+            <input type="text" id="location" name="location" 
+                   value="{{ profile.location }}" 
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; box-sizing: border-box;">
+        </div>
+
+        <!-- Website -->
+        <div style="margin-bottom: 16px;">
+            <label for="website" style="display: block; font-weight: 600; margin-bottom: 6px;">Website</label>
+            <input type="url" id="website" name="website" 
+                   value="{{ profile.website }}" 
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; box-sizing: border-box;">
+        </div>
+
+        <!-- Contact Email -->
+        <div style="margin-bottom: 16px;">
+            <label for="contact_email" style="display: block; font-weight: 600; margin-bottom: 6px;">Contact Email</label>
+            <input type="email" id="contact_email" name="contact_email" 
+                   value="{{ profile.contact_email }}" 
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; box-sizing: border-box;">
+        </div>
+
+        <!-- Contact Phone -->
+        <div style="margin-bottom: 16px;">
+            <label for="contact_phone" style="display: block; font-weight: 600; margin-bottom: 6px;">Contact Phone</label>
+            <input type="text" id="contact_phone" name="contact_phone" 
+                   value="{{ profile.contact_phone }}" 
+                   style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; box-sizing: border-box;">
+        </div>
+
+        <!-- Description -->
+        <div style="margin-bottom: 16px;">
+            <label for="description" style="display: block; font-weight: 600; margin-bottom: 6px;">Description</label>
+            <textarea id="description" name="description" rows="5" 
+                      style="width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; font-family: inherit; box-sizing: border-box;">{{ profile.description }}</textarea>
+        </div>
+
+        <!-- Company Logo -->
+        <div style="margin-bottom: 16px; border: 2px dashed #dee2e6; border-radius: 8px; padding: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Company Logo</label>
+            
+            {% if profile.logo %}
+            <div style="margin-bottom: 12px;">
+                <p style="margin: 0 0 6px 0; color: #6c757d; font-size: 0.9rem;">Current Logo:</p>
+                <img src="{{ profile.logo.url }}" alt="Company Logo" style="max-height: 80px; border-radius: 4px; border: 1px solid #dee2e6;">
+            </div>
+            {% endif %}
+            
+            <input type="file" id="logo" name="logo" accept="image/*" style="display: block;">
+            <small style="color: #6c757d; display: block; margin-top: 4px;">Upload PNG, JPG, or JPEG. Leave empty to keep current.</small>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display: flex; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+            <button type="submit" style="background: #007bff; color: white; padding: 10px 30px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500;">
+                💾 Save Changes
+            </button>
+            <a href="{% url 'companies:profile' %}" style="background: #6c757d; color: white; padding: 10px 30px; border: none; border-radius: 6px; text-decoration: none; font-size: 1rem; font-weight: 500;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input:focus, textarea:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+    button:hover {
+        background: #0056b3 !important;
+        transform: translateY(-1px);
+    }
+    .btn-secondary:hover {
+        background: #5a6268 !important;
+    }
+</style>
+{% endblock %}

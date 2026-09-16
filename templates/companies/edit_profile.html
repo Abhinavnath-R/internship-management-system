@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Company Profile{% endblock %}
+{% block page_title %}Edit Company Profile{% endblock %}
+
+{% block content %}
+<a href="{% url 'companies:profile' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Profile</a>
+
+<div class="form-card">
+    <h2><i class="fas fa-edit"></i> Edit Company Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_company_name">Company Name</label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}<div class="form-error">{{ form.company_name.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_industry">Industry</label>
+                {{ form.industry }}
+                {% if form.industry.errors %}<div class="form-error">{{ form.industry.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_location">Location</label>
+                {{ form.location }}
+                {% if form.location.errors %}<div class="form-error">{{ form.location.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_website">Website</label>
+            {{ form.website }}
+            {% if form.website.errors %}<div class="form-error">{{ form.website.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_description">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}<div class="form-error">{{ form.description.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_contact_email">Contact Email</label>
+                {{ form.contact_email }}
+                {% if form.contact_email.errors %}<div class="form-error">{{ form.contact_email.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_contact_phone">Contact Phone</label>
+                {{ form.contact_phone }}
+                {% if form.contact_phone.errors %}<div class="form-error">{{ form.contact_phone.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_logo">Company Logo</label>
+            {{ form.logo }}
+            {% if profile.logo %}
+            <div class="form-text">Current logo uploaded. Upload a new one to replace it.</div>
+            {% endif %}
+            {% if form.logo.errors %}<div class="form-error">{{ form.logo.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            <a href="{% url 'companies:profile' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

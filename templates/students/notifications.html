@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h2><i class="fas fa-bell"></i> Notifications</h2>
+    {% if notifications %}
+    <form method="POST" action="{% url 'students:mark_all_notifications_read' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline"><i class="fas fa-check-double"></i> Mark All as Read</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if unread_count %}
+<p class="text-muted text-sm mb-3">You have {{ unread_count }} unread notification{{ unread_count|pluralize }}.</p>
+{% endif %}
+
+{% if notifications %}
+<div class="notification-list">
+    {% for notification in notifications %}
+    <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+        <div class="notification-icon">
+            <i class="fas {% if notification.application and notification.application.status == 'accepted' %}fa-check-circle{% elif notification.application and notification.application.status == 'rejected' %}fa-times-circle{% elif notification.application and notification.application.status == 'shortlisted' %}fa-star{% else %}fa-info-circle{% endif %}"></i>
+        </div>
+        <div class="notification-body">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-meta">
+                <span><i class="fas fa-clock"></i> {{ notification.created_at|date:"M d, Y H:i" }}</span>
+                {% if notification.application and notification.application.status == 'shortlisted' %}
+                <span class="notification-tip"><i class="fas fa-lightbulb"></i> Further action will be taken soon — wait for the company to contact you.</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="notification-actions">
+            {% if not notification.is_read %}
+            <form method="POST" action="{% url 'students:mark_notification_read' notification.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline" title="Mark as read"><i class="fas fa-check"></i></button>
+            </form>
+            {% endif %}
+            {% if notification.application %}
+            <a href="{% url 'students:my_applications' %}" class="btn btn-sm btn-primary" title="View Application"><i class="fas fa-eye"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-bell-slash"></i>
+    <h3>No Notifications Yet</h3>
+    <p>When a company reviews, shortlists, accepts, or rejects your application, you'll be notified here.</p>
+    <a href="{% url 'students:browse_internships' %}" class="btn btn-primary"><i class="fas fa-search"></i> Browse Internships</a>
+</div>
+{% endif %}
+{% endblock %}

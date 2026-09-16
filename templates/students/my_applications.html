@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications{% endblock %}
+{% block page_title %}My Applications{% endblock %}
+
+{% block content %}
+{% if applications %}
+<p class="text-muted text-sm mb-3">You have {{ applications|length }} application{{ applications|length|pluralize }}.</p>
+
+<div class="internship-grid" style="grid-template-columns: 1fr;">
+    {% for app in applications %}
+    <div class="internship-card">
+        <div class="internship-card-header">
+            <div class="internship-card-logo">
+                {% if app.internship.company.logo %}
+                <img src="{{ app.internship.company.logo.url }}" alt="{{ app.internship.company.company_name }}">
+                {% else %}
+                <i class="fas fa-building"></i>
+                {% endif %}
+            </div>
+            <div style="min-width: 0;">
+                <div class="internship-card-title">{{ app.internship.title }}</div>
+                <div class="internship-card-company">{{ app.internship.company.company_name }}</div>
+            </div>
+            <div style="margin-left: auto; text-align: right;">
+                <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span>
+                {% if app.internship.is_expired %}
+                <div style="font-size: 11px; color: var(--red); margin-top: 4px;"><i class="fas fa-hourglass-end"></i> Applications Closed</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="internship-card-meta">
+            <span><i class="fas fa-map-marker-alt"></i> {{ app.internship.location }}</span>
+            <span><span class="badge badge-{{ app.internship.internship_type }}">{{ app.internship.get_internship_type_display }}</span></span>
+            <span><i class="fas fa-clock"></i> {{ app.internship.duration }}</span>
+            <span>{% if app.internship.stipend %}<span class="internship-stipend"><i class="fas fa-indian-rupee-sign"></i> {{ app.internship.stipend }}/month</span>{% else %}<span class="text-muted">Unpaid</span>{% endif %}</span>
+            <span><i class="fas fa-calendar-alt"></i> Deadline: {{ app.internship.application_deadline|date:"M d, Y" }}</span>
+        </div>
+
+        <p style="color: var(--gray-600); font-size: 0.875rem; line-height: 1.6; margin-bottom: 16px;">
+            {{ app.internship.description|truncatechars:220 }}
+        </p>
+
+        <!-- Application Summary -->
+        <div class="applicant-details">
+            <span><i class="fas fa-paper-plane"></i> Applied: {{ app.applied_at|date:"M d, Y" }}</span>
+            <span><i class="fas fa-users"></i> {{ app.internship.positions_available }} position{{ app.internship.positions_available|pluralize }}</span>
+        </div>
+        {% if app.cover_letter %}
+        <div class="applicant-cover-letter">
+            <strong><i class="fas fa-file-alt"></i> Your Cover Letter:</strong>
+            <p style="margin-top: 6px; white-space: pre-line;">{{ app.cover_letter|truncatewords:40 }}</p>
+        </div>
+        {% else %}
+        <p class="text-muted text-sm" style="margin-bottom: 14px;"><i class="fas fa-file-alt"></i> No cover letter submitted.</p>
+        {% endif %}
+
+        <!-- Status-specific notes -->
+        {% if app.status == 'shortlisted' %}
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; font-size: 0.85rem; color: #92400e; line-height: 1.5;">
+            <i class="fas fa-hourglass-half" style="color: var(--amber);"></i> <strong>You've been shortlisted!</strong> Further action will be taken soon — please wait for the company to contact you.
+            <div style="margin-top: 10px;">
+                <a href="mailto:{{ app.internship.company.contact_email|default:app.internship.company.user.email }}?subject=Internship Application - {{ app.internship.title }}" class="btn btn-sm btn-outline" title="Email the company">
+                    <i class="fas fa-envelope"></i> Email Company
+                </a>
+            </div>
+        </div>
+        {% elif app.status == 'reviewed' %}
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; font-size: 0.85rem; color: #1e40af; line-height: 1.5;">
+            <i class="fas fa-search"></i> The company has reviewed your application — keep an eye on your notifications for updates.
+        </div>
+        {% elif app.status == 'accepted' %}
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; font-size: 0.85rem; color: #065f46; line-height: 1.5;">
+            <i class="fas fa-check-circle"></i> <strong>Congratulations!</strong> The company will reach out with next steps.
+        </div>
+        {% elif app.status == 'rejected' %}
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; font-size: 0.85rem; color: #991b1b; line-height: 1.5;">
+            <i class="fas fa-times-circle"></i> Don't be discouraged — keep exploring new opportunities!
+        </div>
+        {% endif %}
+
+        <div class="internship-card-footer">
+            <a href="{% url 'students:internship_detail' app.internship.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i> View Internship Details</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <h3>No Applications Yet</h3>
+    <p>You haven't applied to any internships yet. Start exploring opportunities!</p>
+    <a href="{% url 'students:browse_internships' %}" class="btn btn-primary"><i class="fas fa-search"></i> Browse Internships</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Company Profile{% endblock %}
+{% block page_title %}Company Profile{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="profile-avatar">
+        {% if profile.logo %}
+        <img src="{{ profile.logo.url }}" alt="{{ profile.company_name }}">
+        {% else %}
+        {{ profile.company_name|make_list|first|upper }}
+        {% endif %}
+    </div>
+    <div>
+        <div class="profile-name">{{ profile.company_name }}</div>
+        <div class="profile-meta">
+            {% if profile.industry %}{{ profile.industry }}{% endif %}
+            {% if profile.location %} &bull; {{ profile.location }}{% endif %}
+        </div>
+        <div style="margin-top: 8px;">
+            {% if profile.is_verified %}
+            <span class="badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+            {% else %}
+            <span class="badge badge-unverified"><i class="fas fa-clock"></i> Pending Verification</span>
+            {% endif %}
+        </div>
+    </div>
+    <div style="margin-left: auto;">
+        <a href="{% url 'companies:edit_profile' %}" class="btn btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+    </div>
+</div>
+
+<div class="profile-grid">
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-info-circle"></i> Company Details</h3>
+            <div class="profile-field">
+                <span class="label">Company Name</span>
+                <span class="value">{{ profile.company_name }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Industry</span>
+                <span class="value">{{ profile.industry|default:"Not specified" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Website</span>
+                <span class="value">{% if profile.website %}<a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a>{% else %}Not provided{% endif %}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Location</span>
+                <span class="value">{{ profile.location|default:"Not specified" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-phone"></i> Contact Information</h3>
+            <div class="profile-field">
+                <span class="label">Email</span>
+                <span class="value">{{ profile.contact_email|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Phone</span>
+                <span class="value">{{ profile.contact_phone|default:"Not provided" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-align-left"></i> About</h3>
+            <p>{{ profile.description|default:"No description provided."|linebreaksbr }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

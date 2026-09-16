@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}My Internships{% endblock %}
+{% block page_title %}My Internships{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h2>Your Internship Postings</h2>
+    <a href="{% url 'companies:post_internship' %}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Post New</a>
+</div>
+
+<div class="filter-tabs">
+    <a href="{% url 'companies:my_internships' %}" class="filter-tab {% if not filter_status %}active{% endif %}">All</a>
+    <a href="{% url 'companies:my_internships' %}?status=active" class="filter-tab {% if filter_status == 'active' %}active{% endif %}">Active</a>
+    <a href="{% url 'companies:my_internships' %}?status=inactive" class="filter-tab {% if filter_status == 'inactive' %}active{% endif %}">Inactive</a>
+</div>
+
+<p class="text-muted text-sm mb-3">{{ internships|length }} internship{{ internships|length|pluralize }} found</p>
+
+{% if internships %}
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Applications</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for internship in internships %}
+            <tr>
+                <td><strong>{{ internship.title }}</strong></td>
+                <td><span class="badge badge-{{ internship.internship_type }}">{{ internship.get_internship_type_display }}</span></td>
+                <td>{{ internship.application_deadline|date:"M d, Y" }}</td>
+                <td>
+                    {% if internship.is_expired %}
+                    <span class="badge badge-rejected"><i class="fas fa-hourglass-end"></i> Expired</span>
+                    {% elif internship.is_active %}
+                    <span class="badge badge-active"><i class="fas fa-circle"></i> Live</span>
+                    {% else %}
+                    <span class="badge badge-inactive"><i class="fas fa-pause-circle"></i> Inactive</span>
+                    {% endif %}
+                </td>
+                <td>{{ internship.total_applications }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'companies:view_applicants' internship.pk %}" class="btn btn-sm btn-primary" title="View Applicants"><i class="fas fa-users"></i></a>
+                        <a href="{% url 'companies:edit_internship' internship.pk %}" class="btn btn-sm btn-outline" title="Edit"><i class="fas fa-edit"></i></a>
+                        <form method="POST" action="{% url 'companies:delete_internship' internship.pk %}" style="display:inline;" data-confirm="Are you sure you want to delete this internship? This action cannot be undone.">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-briefcase"></i>
+    <h3>{% if filter_status %}No Internships Found{% else %}No Internships Posted{% endif %}</h3>
+    <p>{% if filter_status %}No internships match the selected filter.{% else %}Post your first internship to start finding talented students!{% endif %}</p>
+    <a href="{% url 'companies:post_internship' %}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Post Internship</a>
+</div>
+{% endif %}
+{% endblock %}

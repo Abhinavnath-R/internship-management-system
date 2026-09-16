@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+{% block page_title %}Edit Profile{% endblock %}
+
+{% block content %}
+<a href="{% url 'students:profile' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Profile</a>
+
+<div class="form-card">
+    <h2><i class="fas fa-edit"></i> Edit Your Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 16px; margin-top: 8px;"><i class="fas fa-user" style="color: var(--blue);"></i> Personal Information</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_first_name">First Name</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}<div class="form-error">{{ form.first_name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_last_name">Last Name</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}<div class="form-error">{{ form.last_name.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="id_phone">Phone</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="form-error">{{ form.phone.errors.0 }}</div>{% endif %}
+        </div>
+
+        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--navy); margin: 24px 0 16px;"><i class="fas fa-graduation-cap" style="color: var(--blue);"></i> Academic Information</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_university">University</label>
+                {{ form.university }}
+                {% if form.university.errors %}<div class="form-error">{{ form.university.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_degree">Degree</label>
+                {{ form.degree }}
+                {% if form.degree.errors %}<div class="form-error">{{ form.degree.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_major">Major</label>
+                {{ form.major }}
+                {% if form.major.errors %}<div class="form-error">{{ form.major.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_graduation_year">Graduation Year</label>
+                {{ form.graduation_year }}
+                {% if form.graduation_year.errors %}<div class="form-error">{{ form.graduation_year.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="id_gpa">GPA</label>
+            {{ form.gpa }}
+            {% if form.gpa.errors %}<div class="form-error">{{ form.gpa.errors.0 }}</div>{% endif %}
+        </div>
+
+        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--navy); margin: 24px 0 16px;"><i class="fas fa-tools" style="color: var(--blue);"></i> Additional Information</h3>
+        <div class="form-group">
+            <label for="id_skills">Skills (comma-separated)</label>
+            {{ form.skills }}
+            <div class="form-text">E.g., Python, JavaScript, Data Analysis, Communication</div>
+            {% if form.skills.errors %}<div class="form-error">{{ form.skills.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_bio">Bio</label>
+            {{ form.bio }}
+            {% if form.bio.errors %}<div class="form-error">{{ form.bio.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_linkedin_url">LinkedIn URL</label>
+                {{ form.linkedin_url }}
+                {% if form.linkedin_url.errors %}<div class="form-error">{{ form.linkedin_url.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_github_url">GitHub URL</label>
+                {{ form.github_url }}
+                {% if form.github_url.errors %}<div class="form-error">{{ form.github_url.errors.0 }}</div>{% endif %}
+            </div>
+        </div>
+
+        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--navy); margin: 24px 0 16px;"><i class="fas fa-file" style="color: var(--blue);"></i> Documents</h3>
+        <div class="form-group">
+            <label for="id_resume">Resume (PDF, DOC, DOCX — Max 5MB)</label>
+            {{ form.resume }}
+            {% if profile.resume %}
+            <div class="form-text">Current: <a href="{{ profile.resume.url }}" target="_blank">View current resume</a></div>
+            {% endif %}
+            {% if form.resume.errors %}<div class="form-error">{{ form.resume.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_profile_picture">Profile Picture</label>
+            {{ form.profile_picture }}
+            {% if form.profile_picture.errors %}<div class="form-error">{{ form.profile_picture.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            <a href="{% url 'students:profile' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Analytics{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h2><i class="fas fa-chart-bar"></i> Reports & Analytics</h2>
+    <a href="{% url 'dashboard:export_report' %}" class="btn btn-primary"><i class="fas fa-download"></i> Export CSV</a>
+</div>
+
+<div class="report-grid">
+    <!-- Application Status Summary -->
+    <div class="report-card">
+        <div class="report-card-header"><i class="fas fa-chart-pie"></i> Application Status Summary</div>
+        <div class="report-card-body">
+            {% if status_stats %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in status_stats %}
+                    <tr>
+                        <td><span class="badge badge-{{ stat.status }}">{{ stat.status|title }}</span></td>
+                        <td><strong>{{ stat.count }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted text-center">No application data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Top Companies -->
+    <div class="report-card">
+        <div class="report-card-header"><i class="fas fa-trophy"></i> Top Companies by Applications</div>
+        <div class="report-card-body">
+            {% if top_companies %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Applications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in top_companies %}
+                    <tr>
+                        <td><strong>{{ company.company_name }}</strong></td>
+                        <td>{{ company.app_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted text-center">No company data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Internship Type Distribution -->
+    <div class="report-card">
+        <div class="report-card-header"><i class="fas fa-chart-bar"></i> Internship Type Distribution</div>
+        <div class="report-card-body">
+            {% if type_stats %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in type_stats %}
+                    <tr>
+                        <td><span class="badge badge-{{ stat.internship_type }}">{{ stat.internship_type|title }}</span></td>
+                        <td><strong>{{ stat.count }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted text-center">No internship data available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

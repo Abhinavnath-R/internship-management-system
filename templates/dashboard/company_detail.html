@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.company_name }} - Company Details{% endblock %}
+{% block page_title %}Company Details{% endblock %}
+
+{% block content %}
+<a href="{% url 'dashboard:manage_companies' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Companies</a>
+
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="profile-avatar">
+        {% if company.logo %}
+        <img src="{{ company.logo.url }}" alt="{{ company.company_name }}">
+        {% else %}
+        {{ company.company_name|make_list|first|upper }}
+        {% endif %}
+    </div>
+    <div>
+        <div class="profile-name">{{ company.company_name }}</div>
+        <div class="profile-meta">
+            {% if company.industry %}{{ company.industry }}{% endif %}
+            {% if company.location %} &bull; {{ company.location }}{% endif %}
+        </div>
+        <div style="margin-top: 8px;">
+            {% if company.is_verified %}
+            <span class="badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+            {% if not company.user.is_active %}
+            <span class="badge badge-rejected"><i class="fas fa-pause-circle"></i> Inactive</span>
+            {% endif %}
+            {% else %}
+            <span class="badge badge-unverified"><i class="fas fa-clock"></i> Unverified</span>
+            {% endif %}
+            <span class="text-muted">Joined {{ company.created_at|date:"M d, Y" }}</span>
+        </div>
+    </div>
+    <div style="margin-left: auto; text-align: right;">
+        <div class="text-muted" style="font-size: 12px; margin-bottom: 8px;">Last updated {{ company.updated_at|date:"M d, Y" }}</div>
+        <div class="btn-group">
+            {% if not company.is_verified %}
+            <form method="POST" action="{% url 'dashboard:verify_company' company.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Verify</button>
+            </form>
+            {% else %}
+            <form method="POST" action="{% url 'dashboard:toggle_company_active' company.pk %}" style="display:inline;">
+                {% csrf_token %}
+                {% if company.user.is_active %}
+                <button type="submit" class="btn btn-warning"><i class="fas fa-pause-circle"></i> Deactivate</button>
+                {% else %}
+                <button type="submit" class="btn btn-success"><i class="fas fa-play-circle"></i> Activate</button>
+                {% endif %}
+            </form>
+            {% endif %}
+            <form method="POST" action="{% url 'dashboard:delete_company' company.pk %}" style="display:inline;" data-confirm="Are you sure you want to delete this company? This will remove all their internships and data.">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="profile-grid">
+    <!-- Company Details -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-info-circle"></i> Company Details</h3>
+            <div class="profile-field">
+                <span class="label">Company Name</span>
+                <span class="value">{{ company.company_name }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Industry</span>
+                <span class="value">{{ company.industry|default:"Not specified" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Website</span>
+                <span class="value">{% if company.website %}<a href="{{ company.website }}" target="_blank">{{ company.website }}</a>{% else %}Not provided{% endif %}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Location</span>
+                <span class="value">{{ company.location|default:"Not specified" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-phone"></i> Contact Information</h3>
+            <div class="profile-field">
+                <span class="label">Username</span>
+                <span class="value">{{ company.user.username }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Email</span>
+                <span class="value">{{ company.contact_email|default:company.user.email }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Phone</span>
+                <span class="value">{{ company.contact_phone|default:"Not provided" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-chart-bar"></i> Activity Summary</h3>
+            <div class="profile-field">
+                <span class="label">Account Status</span>
+                <span class="value">{% if company.user.is_active %}<span class="badge badge-approved"><i class="fas fa-circle"></i> Active</span>{% else %}<span class="badge badge-rejected"><i class="fas fa-circle"></i> Inactive</span>{% endif %}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Profile Completion</span>
+                <span class="value">{{ company.profile_completion }}%</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Internships Posted</span>
+                <span class="value">{{ total_internships }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Total Applications Received</span>
+                <span class="value">{{ total_applications }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Joined</span>
+                <span class="value">{{ company.created_at|date:"F d, Y" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Last Updated</span>
+                <span class="value">{{ company.updated_at|date:"F d, Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-align-left"></i> About</h3>
+            <p>{{ company.description|default:"No description provided."|linebreaksbr }}</p>
+        </div>
+    </div>
+
+    <!-- Internships -->
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-briefcase"></i> Internships Posted ({{ internships|length }})</h3>
+            {% if internships %}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Applicants</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for internship in internships %}
+                        <tr>
+                            <td><strong>{{ internship.title }}</strong></td>
+                            <td><span class="badge badge-{{ internship.internship_type }}">{{ internship.get_internship_type_display }}</span></td>
+                            <td>{{ internship.application_deadline|date:"M d, Y" }}</td>
+                            <td>
+                                {% if internship.is_expired %}
+                                <span class="badge badge-rejected"><i class="fas fa-hourglass-end"></i> Expired</span>
+                                {% elif internship.is_active %}
+                                <span class="badge badge-active"><i class="fas fa-circle"></i> Active</span>
+                                {% else %}
+                                <span class="badge badge-inactive"><i class="fas fa-pause-circle"></i> Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ internship.total_applications }}</td>
+                            <td>
+                                <a href="{% url 'dashboard:view_internship' internship.pk %}" class="btn btn-sm btn-outline"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">This company hasn't posted any internships yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

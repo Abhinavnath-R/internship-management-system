@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load student_extras %}
+
+{% block title %}{{ student.full_name }} - Student Details{% endblock %}
+{% block page_title %}Student Details{% endblock %}
+
+{% block content %}
+<a href="{% url 'dashboard:manage_students' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Students</a>
+
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="profile-avatar">
+        {% if student.profile_picture %}
+        <img src="{{ student.profile_picture.url }}" alt="{{ student.full_name }}">
+        {% else %}
+        {{ student.first_name|make_list|first|upper|default:"S" }}
+        {% endif %}
+    </div>
+    <div>
+        <div class="profile-name">{{ student.full_name }}</div>
+        <div class="profile-meta">
+            {% if student.university %}{{ student.university }}{% endif %}
+            {% if student.major %} &bull; {{ student.major }}{% endif %}
+        </div>
+        <div class="profile-meta">
+            <span class="badge badge-active"><i class="fas fa-chart-line"></i> {{ student.profile_completion }}% Complete</span>
+            <span class="badge badge-{{ student.user.is_active|yesno:'approved,rejected' }}"><i class="fas fa-circle"></i> {{ student.user.is_active|yesno:'Active,Inactive' }}</span>
+            <span class="text-muted">Joined {{ student.created_at|date:"M d, Y" }}</span>
+        </div>
+    </div>
+    <div style="margin-left: auto;">
+        <form method="POST" action="{% url 'dashboard:delete_student' student.pk %}" style="display:inline;" data-confirm="Are you sure you want to delete this student? This will also delete their account and all applications.">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete Student</button>
+        </form>
+    </div>
+</div>
+
+<!-- Stats Summary -->
+<div class="stats-grid" style="margin-bottom: 24px;">
+    <div class="stat-card blue" style="padding: 16px;">
+        <div class="stat-info">
+            <h4>Total Applications</h4>
+            <div class="stat-number">{{ total_apps }}</div>
+        </div>
+    </div>
+    <div class="stat-card amber" style="padding: 16px;">
+        <div class="stat-info">
+            <h4>Pending</h4>
+            <div class="stat-number" style="color: var(--amber);">{{ pending_apps }}</div>
+        </div>
+    </div>
+    <div class="stat-card emerald" style="padding: 16px;">
+        <div class="stat-info">
+            <h4>Accepted</h4>
+            <div class="stat-number" style="color: var(--emerald);">{{ accepted_apps }}</div>
+        </div>
+    </div>
+    <div class="stat-card rose" style="padding: 16px;">
+        <div class="stat-info">
+            <h4>Rejected</h4>
+            <div class="stat-number" style="color: var(--red);">{{ rejected_apps }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="profile-grid">
+    <!-- Personal Info -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
+            <div class="profile-field">
+                <span class="label">Username</span>
+                <span class="value">{{ student.user.username }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Full Name</span>
+                <span class="value">{{ student.full_name }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Email</span>
+                <span class="value">{{ student.user.email }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Phone</span>
+                <span class="value">{{ student.phone|default:"Not provided" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Info -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-graduation-cap"></i> Academic Information</h3>
+            <div class="profile-field">
+                <span class="label">University</span>
+                <span class="value">{{ student.university|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Degree</span>
+                <span class="value">{{ student.degree|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Major</span>
+                <span class="value">{{ student.major|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">Graduation Year</span>
+                <span class="value">{{ student.graduation_year|default:"Not provided" }}</span>
+            </div>
+            <div class="profile-field">
+                <span class="label">GPA</span>
+                <span class="value">{{ student.gpa|default:"Not provided" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-tools"></i> Skills</h3>
+            {% if student.skills %}
+            <div class="skill-tags">
+                {% for skill in student.skills|split:"," %}
+                <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No skills added yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bio -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-info-circle"></i> About</h3>
+            <p>{{ student.bio|default:"No bio added yet."|linebreaksbr }}</p>
+        </div>
+    </div>
+
+    <!-- Links -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-link"></i> Links</h3>
+            <div class="profile-field">
+                <span class="label">LinkedIn</span>
+                <span class="value">
+                    {% if student.linkedin_url %}<a href="{{ student.linkedin_url }}" target="_blank">{{ student.linkedin_url }}</a>{% else %}Not provided{% endif %}
+                </span>
+            </div>
+            <div class="profile-field">
+                <span class="label">GitHub</span>
+                <span class="value">
+                    {% if student.github_url %}<a href="{{ student.github_url }}" target="_blank">{{ student.github_url }}</a>{% else %}Not provided{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume -->
+    <div class="card">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-file-pdf"></i> Resume</h3>
+            {% if student.resume %}
+            <a href="{{ student.resume.url }}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download Resume</a>
+            {% else %}
+            <p class="text-muted">No resume uploaded.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Applications History -->
+    <div class="card" style="grid-column: 1 / -1;">
+        <div class="card-body profile-section">
+            <h3><i class="fas fa-paper-plane"></i> Application History ({{ applications|length }})</h3>
+            {% if applications %}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Internship</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td><strong>{{ app.internship.title }}</strong></td>
+                            <td>{{ app.internship.company.company_name }}</td>
+                            <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                            <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">This student hasn't applied to any internships yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

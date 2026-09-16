@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Company Dashboard{% endblock %}
+{% block page_title %}Company Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--navy);">Welcome, {{ profile.company_name }}!</h2>
+    {% if profile.is_verified %}
+    <span class="badge badge-verified"><i class="fas fa-check-circle"></i> Verified Company</span>
+    {% else %}
+    <span class="badge badge-unverified"><i class="fas fa-clock"></i> Pending Verification</span>
+    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px 16px; margin-top: 12px; color: #856404; font-size: 14px;">
+        <i class="fas fa-exclamation-triangle"></i> <strong>Your company is pending admin approval.</strong> You will be able to post internships once your account is verified by an administrator.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Profile Completion -->
+<div class="progress-bar-container">
+    <div class="progress-label">
+        <span>Profile Completion</span>
+        <span>{{ profile.profile_completion }}%</span>
+    </div>
+    <div class="progress-track">
+        <div class="progress-fill" style="width: {{ profile.profile_completion }}%;" data-width="{{ profile.profile_completion }}%"></div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card blue">
+        <div class="stat-icon blue"><i class="fas fa-briefcase"></i></div>
+        <div class="stat-info">
+            <h4>Total Internships</h4>
+            <div class="stat-number">{{ total_internships }}</div>
+        </div>
+    </div>
+    <div class="stat-card emerald">
+        <div class="stat-icon emerald"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info">
+            <h4>Active Internships</h4>
+            <div class="stat-number">{{ active_internships }}</div>
+        </div>
+    </div>
+    <div class="stat-card purple">
+        <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+            <h4>Total Applicants</h4>
+            <div class="stat-number">{{ total_applicants }}</div>
+        </div>
+    </div>
+    <div class="stat-card amber">
+        <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+        <div class="stat-info">
+            <h4>Pending Reviews</h4>
+            <div class="stat-number">{{ pending_applications }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    {% if profile.is_verified %}
+    <a href="{% url 'companies:post_internship' %}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Post New Internship</a>
+    {% else %}
+    <span class="btn btn-primary" style="opacity: 0.5; cursor: not-allowed; pointer-events: none;"><i class="fas fa-plus-circle"></i> Post New Internship (Pending Approval)</span>
+    {% endif %}
+    <a href="{% url 'companies:profile' %}" class="btn btn-outline"><i class="fas fa-building"></i> View Profile</a>
+</div>
+
+<!-- Recent Applications -->
+<div class="section-header">
+    <h2><i class="fas fa-history"></i> Recent Applications</h2>
+</div>
+
+{% if recent_applications %}
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Internship</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in recent_applications %}
+            <tr>
+                <td><strong>{{ app.student.full_name }}</strong></td>
+                <td>{{ app.internship.title }}</td>
+                <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+                <td>{{ app.applied_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <h3>No Applications Yet</h3>
+    <p>Post internships to start receiving applications from students.</p>
+</div>
+{% endif %}
+{% endblock %}

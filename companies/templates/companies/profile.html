@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Company Profile{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+    <div>
+        <h1 style="margin-bottom: 8px;">{{ profile.company_name }}</h1>
+        <div style="margin-top: 8px;">
+            {% if profile.is_verified %}
+            <span class="badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+            {% else %}
+            <span class="badge badge-unverified"><i class="fas fa-clock"></i> Pending Verification</span>
+            {% endif %}
+        </div>
+    </div>
+    <div style="margin-left: auto;">
+        <a href="{% url 'companies:edit_profile' %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+    </div>
+</div>
+
+<hr style="margin: 24px 0;">
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+        <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Industry</h3>
+        <p style="font-size: 1.1rem;">{{ profile.industry|default:"Not specified" }}</p>
+    </div>
+    <div>
+        <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Location</h3>
+        <p style="font-size: 1.1rem;">{{ profile.location|default:"Not specified" }}</p>
+    </div>
+    <div>
+        <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Website</h3>
+        <p style="font-size: 1.1rem;">
+            {% if profile.website %}
+            <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a>
+            {% else %}
+            Not specified
+            {% endif %}
+        </p>
+    </div>
+    <div>
+        <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Contact Email</h3>
+        <p style="font-size: 1.1rem;">{{ profile.contact_email|default:"Not specified" }}</p>
+    </div>
+    <div>
+        <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Contact Phone</h3>
+        <p style="font-size: 1.1rem;">{{ profile.contact_phone|default:"Not specified" }}</p>
+    </div>
+    <div>
+        <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Profile Completion</h3>
+        <p style="font-size: 1.1rem;">{{ profile.profile_completion }}%</p>
+        <div style="width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+            <div style="width: {{ profile.profile_completion }}%; height: 100%; background: #28a745; border-radius: 4px;"></div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 24px;">
+    <h3 style="color: #6c757d; font-size: 0.9rem; margin-bottom: 4px;">Description</h3>
+    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 1rem; line-height: 1.6;">
+        {{ profile.description|default:"No description provided."|linebreaks }}
+    </div>
+</div>
+
+<div style="margin-top: 24px; font-size: 0.85rem; color: #6c757d;">
+    <p>Profile created: {{ profile.created_at|date:"M d, Y" }}</p>
+    <p>Last updated: {{ profile.updated_at|date:"M d, Y H:i" }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--navy);">Admin Panel</h2>
+    <p class="text-muted">Browse the system by category — click a card to view its details.</p>
+</div>
+
+<div class="stats-grid">
+    <a href="{% url 'dashboard:manage_companies' %}" class="stat-card-link">
+        <div class="stat-card purple">
+            <div class="stat-icon purple"><i class="fas fa-building"></i></div>
+            <div class="stat-info">
+                <h4>Total Companies</h4>
+                <div class="stat-number">{{ total_companies }}</div>
+            </div>
+            <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+    </a>
+    <a href="{% url 'dashboard:manage_students' %}" class="stat-card-link">
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-info">
+                <h4>Total Students</h4>
+                <div class="stat-number">{{ total_students }}</div>
+            </div>
+            <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+    </a>
+    <a href="{% url 'dashboard:manage_companies' %}?verified=no" class="stat-card-link">
+        <div class="stat-card amber">
+            <div class="stat-icon amber"><i class="fas fa-shield-alt"></i></div>
+            <div class="stat-info">
+                <h4>Unverified Companies</h4>
+                <div class="stat-number">{{ unverified_companies }}</div>
+            </div>
+            <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+    </a>
+</div>
+
+<div class="section-header" style="margin-top: 8px;">
+    <h2><i class="fas fa-chart-pie"></i> Overview Chart</h2>
+</div>
+
+<div class="chart-grid">
+    <div class="chart-card">
+        <div class="chart-card-header"><i class="fas fa-users"></i> Companies vs Students</div>
+        <div class="chart-card-body">
+            <canvas id="usersChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-card-header"><i class="fas fa-shield-alt"></i> Company Verification Status</div>
+        <div class="chart-card-body">
+            <canvas id="verificationChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Companies vs Students doughnut
+    const usersCtx = document.getElementById('usersChart');
+    if (usersCtx) {
+        new Chart(usersCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Companies', 'Students'],
+                datasets: [{
+                    data: [{{ total_companies }}, {{ total_students }}],
+                    backgroundColor: ['#8b5cf6', '#3b82f6'],
+                    borderColor: '#ffffff',
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18,
+                            font: { family: 'Inter', size: 13, weight: '600' },
+                            color: '#334155'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Verified vs Unverified companies bar chart
+    const verifyCtx = document.getElementById('verificationChart');
+    if (verifyCtx) {
+        new Chart(verifyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Verified', 'Unverified'],
+                datasets: [{
+                    label: 'Companies',
+                    data: [{{ verified_companies }}, {{ unverified_companies }}],
+                    backgroundColor: ['#10b981', '#f59e0b'],
+                    borderRadius: 8,
+                    maxBarThickness: 70
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, color: '#64748b', font: { family: 'Inter', size: 12 } },
+                        grid: { color: '#f1f5f9' }
+                    },
+                    x: {
+                        ticks: { color: '#334155', font: { family: 'Inter', size: 13, weight: '600' } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
